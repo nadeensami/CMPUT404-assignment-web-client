@@ -24,6 +24,9 @@ import re
 # you may use urllib to encode data appropriately
 from urllib.parse import urlparse, urlencode
 
+# documentation for urllib.parse found in:
+# https://docs.python.org/3/library/urllib.parse.html
+
 def help():
   print("httpclient.py [GET/POST] [URL]\n")
 
@@ -34,8 +37,7 @@ class HTTPResponse(object):
 
 class HTTPClient(object):
   def get_host_port(self,url):
-    # https://docs.python.org/3/library/urllib.parse.html
-    # https://docs.oracle.com/en/storage/tape-storage/sl4000/slklg/default-port-numbers.html#GUID-8B442CCE-F94D-4DFB-9F44-996DE72B2558
+    # Given a url, returns a dictionary of relevant compoennts
     parsedurl = {}
 
     o = urlparse(url)
@@ -46,6 +48,7 @@ class HTTPClient(object):
     parsedurl['host'] = o.hostname
     parsedurl['port'] = o.port if o.port else 80 # default port if not specified
     parsedurl['path'] = o.path if o.path else '/' # default path if not specified
+    parsedurl['query'] = o.query if o.query else ''
 
     return parsedurl
 
@@ -127,6 +130,10 @@ class HTTPClient(object):
       req_body = urlencode(args)
     else:
       req_body = ''
+
+    # Add query string
+    req_body += "&" + parsedurl['query']
+    
     content_length = len(req_body.encode('utf-8'))
 
     # Send request to the server
